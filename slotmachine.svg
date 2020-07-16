@@ -1,0 +1,291 @@
+<!--
+  based on http://www.treebuilder.de/default.asp?file=163540.xml 
+-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="-10 -12 350 250">
+  <style type="text/css">
+   .btn:hover{fill:url(#btnbg2)}
+   </style>
+   <script><![CDATA[
+     xlns="http://www.w3.org/1999/xlink"
+     // the durations of the three wheels
+     dur=new Array(0,0,0)
+     // game time
+     ctime=new Array(0,0,0)
+     // total time (current wheel position)
+     ttime=new Array(0,0,0)
+     // the number of pictures per wheel
+     pics=new Array(4,4,4)
+     // how much money we have
+     acc=100
+     
+     // animatetimer
+     var animatetimer
+     var animatey=0
+     var animatedirection=0;
+
+     // step the given wheel forward
+     function step(wheel,amount,asResult) {
+       ctime[wheel-1]+=amount
+       ttime[wheel-1]+=amount
+       // select image by total time
+       var i=ttime[wheel-1] % pics[wheel-1] + 1
+       setpicture(wheel,i,asResult)
+     }
+     
+     // animate the handle
+     function animatehandle() {
+       animatey+=animatedirection
+       var knobr=Math.floor(25+animatey/10)
+       var polew=Math.floor(18+animatey/10)
+       // alert(knobr)
+       document.getElementById("knob").setAttribute("transform", "translate(0," +animatey + ")") // Translate the knob
+       document.getElementById("kcircle").setAttribute("r", ""+knobr) // makeit bigger
+       document.getElementById("pole").setAttribute("width", ""+polew) // makeit bigger
+       if (animatey>=39 || animatey<=0 ) {
+         clearInterval(animatetimer)
+         if (animatey>=39) {
+            startWheels()
+            handleBack()
+         }
+       }
+     }
+     
+     // start playing
+     function startPlay(){
+       animatey=0;
+       animatedirection=3
+       animatetimer=setInterval(animatehandle,10)
+     }
+     
+     function handleBack() {
+       animatey=39;
+       animatedirection=-3
+       animatetimer=setInterval(animatehandle,10)
+     }
+     
+     function startWheels() {
+       // as long as there is at least 10 moneyunits left
+       if(acc >= 10){
+         document.documentElement.setAttribute("pointer-events","none")
+         // subtract 10 moneyunits
+         acc-=10
+         // and show the amount of money left
+         document.getElementById("acc").firstChild.nodeValue=acc
+         
+         // set the durations of the three wheels (as a number of wheel turns)
+         dur[0]=Math.floor(Math.random()*10+10) // 10-20 turns
+         dur[1]=Math.floor(Math.random()*10+dur[0]+10) // another 10-20 turns
+         dur[2]=Math.floor(Math.random()*10+dur[1]+10) // another 10-20 turns
+         
+         // reset the stopwatch
+         ctime[0]=0
+         ctime[1]=0
+         ctime[2]=0
+         
+         // 
+         setTimeout("play()",100)
+       } else{
+         // no money left
+         alert("Game Over\n to play again reload the page!")
+       }
+     }
+     
+     // set the given picture
+     function setpicture(wheel,picindex,asResult) {
+       wheelimg="u"+wheel
+       target="#i"+picindex
+       if (asResult)
+          target=target+"w"+wheel
+       //alert("setpicture wheel:"+wheel+" picindex: "+picindex+" asResult:"+asResult+" wheelimg="+wheelimg+" target="+target)
+       document.getElementById(wheelimg).setAttributeNS(xlns,"href",target)
+     }
+
+     // play
+     function play(){
+       // loop over the three wheels
+       for(var j=0;j<3;j++){
+
+         if(ctime[j]<=dur[j]){
+         	 step(j+1,1,false)
+         }else{
+           step(j+1,0,true)
+         }
+       }
+
+       // check if the game is over
+	     if(ctime[2]<dur[2]){
+	       setTimeout("play()",100)
+	     }else {
+	       var i=ttime[2] % pics[2] + 1
+	       setpicture(3,i,true)
+	       document.documentElement.setAttribute("pointer-events","all")
+	       score();
+	     }
+    }
+    
+    // calculate and show the score
+    function score() {
+      var a=ttime[0] % 4 + 1
+			var b=ttime[1] % 4 + 1
+			var c=ttime[2] % 4 + 1
+			if(a==4 || b==4 || c==4){
+			return 0
+			}
+			
+			if(a==b && b==c){ 
+			 if(a==2){acc+=300}
+			 if(a==1){acc+=200}
+			 if(a==3){acc+=100}
+			 document.getElementById("acc").firstChild.nodeValue=acc
+			 return 0
+			}
+			if((a==2 && (a==b || c==a)) || (b==2 && (a==b || c==b))){
+			 acc+=40
+			 document.getElementById("acc").firstChild.nodeValue=acc
+			 return 0
+			}
+			if(a==b || b==c || c==a){
+			 acc+=10
+			 document.getElementById("acc").firstChild.nodeValue=acc
+			 return 0
+			}
+    }
+
+]]></script>
+
+
+	<linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1">
+	  <stop offset="0" stop-color="#ccc"/>
+	  <stop offset="1" stop-color="#666"/>
+	</linearGradient>
+	<linearGradient id="lg2" x1="0" y1="0" x2="0" y2="1">
+	  <stop offset="0" stop-color="#666"/>
+	  <stop offset="0.5" stop-color="white"/>
+	  <stop offset="1" stop-color="#666"/>
+	</linearGradient>
+	<linearGradient id="lg3" x1="0" y1="0" x2="0" y2="1">
+	  <stop offset="0" stop-color="white"/>
+	  <stop offset="1" stop-color="white" stop-opacity="0"/>
+	</linearGradient>
+	<linearGradient id="lg4" x1="0" y1="1" x2="0" y2="0">
+	  <stop offset="0" stop-color="white" stop-opacity="0.5"/>
+	  <stop offset="1" stop-color="white" stop-opacity="0"/>
+	</linearGradient>
+	
+	<linearGradient id="btnbg" x1="0" y1="1" x2="0" y2="0">
+	  <stop offset="0" stop-color="#666"/>
+	  <stop offset="1" stop-color="#ccc"/>
+	</linearGradient>
+	
+	<linearGradient id="btnbg2" x1="0" y1="1" x2="0" y2="0">
+	  <stop offset="0" stop-color="#333"/>
+	  <stop offset="1" stop-color="#aaa"/>
+	</linearGradient>
+	
+	<linearGradient id="knobg" x1="0" y1="1" x2="0" y2="0">
+	  <stop offset="0" stop-color="#FF0000"/>
+	  <stop offset="1" stop-color="#FFFFFF"/>
+	</linearGradient>	
+
+  // images for wheel 1
+  <image id="i1w1" xlink:href="nut.png"              x="5" y="5" width= "90" height= "90"/>
+  <image id="i2w1" xlink:href="javalogo.png"         x="0" y="0" width="100" height="100"/>
+  <image id="i3w1" xlink:href="csharplogo.svg"       x="0" y="0" width="100" height="100"/>
+  <image id="i4w1" xlink:href="phplogo.png"          x="5" y="0" width= "90" height="100"/>
+ 
+  // images for wheel 2
+  <image id="i1w2" xlink:href="nut.png"              x="5" y="5" width= "90" height= "90"/>
+  <image id="i2w2" xlink:href="eclipselogo.png"      x="0" y="0" width="100" height="100"/>
+  <image id="i3w2" xlink:href="visualstudiologo.png" x="5" y="0" width= "90" height="100"/>
+  <image id="i4w2" xlink:href="netbeanslogo.png"     x="0" y="0" width="100" height="100"/>
+  
+  // images for wheel 3
+  <image id="i1w3" xlink:href="nut.png"              x="5" y="5" width= "90" height= "90"/>
+  <image id="i2w3" xlink:href="gitlogo.svg"          x="0" y="0" width="100" height="100"/>
+  <image id="i3w3" xlink:href="subversionlogo.png"   x="5" y="0" width="80"  height="100"/>
+  <image id="i4w3" xlink:href="cvslogo.svg"          x="5" y="0" width="100" height="100"/>
+
+  <image id="i1" xlink:href="spin1.png" x="0" y="0" width="100" height="100"/>
+  <image id="i2" xlink:href="spin2.png" x="0" y="0" width="100" height="100"/>
+  <image id="i3" xlink:href="spin3.png" x="0" y="0" width="100" height="100"/>
+  <image id="i4" xlink:href="spin4.png" x="0" y="0" width="100" height="100"/>
+
+  // start knob
+  <g id="handle"> 
+    <rect id="pole" x="330" y="50" width="18" height="160" fill="url(#lg1)" />
+    <rect x="310" y="160" width="45" height="40" fill="url(#btnbg2)" />
+    <g id="knob" onclick="startPlay()" transform="translate(0,0)" >
+      <circle id="kcircle" cx="340" cy="30" r="25" fill="url(#knobg)"/>
+      <rect class="btn" x="318" y="20" width="45" height="20" rx="10" ry="10" fill="url(#btnbg)" cursor="pointer"/>
+      <text text-anchor="middle" x="340" y="32" fill="white" pointer-events="none">play</text>
+    </g>
+  </g>
+  
+  // frame of the slot machine
+  <rect x="-10" y="-10" width="320" height="245" fill="url(#lg1)" stroke="black" rx="10" ry="10"/>
+  // top inner black frame
+  <rect x="-5" y="-5" width="310" height="110"  fill="black" rx="7" ry="7"/>
+
+  <rect x="0" y="0" width="300" height="100" fill="url(#lg2)" stroke="black" rx="10" ry="50"/>
+  <rect x="100" y="0" width="100" height="100" fill="url(#lg2)" stroke="black" rx="10" ry="50"/>
+
+  // the wheels
+  <use id="u1" xlink:href="#i1w1" x="0" y="0" width="100" height="100"/>
+  <use id="u2" xlink:href="#i1w2" x="100" y="0" width="100" height="100"/>
+  <use id="u3" xlink:href="#i1w3" x="200" y="0" width="100" height="100"/>
+
+  <rect x="-3" y="-3" width="306" height="51"  fill="url(#lg3)" rx="6" ry="6"/>
+
+  // money display
+  <rect x="220" y="115" width="85" height="20"/>
+  <text text-anchor="end" x="300" y="130" fill="lime" id="acc">100</text>
+
+
+  <g onclick="step(1,1,true)">
+    <image xlink:href="nut.png" x="0" y="110" width="30" height="30"/>
+  </g>  
+  <g onclick="step(2,1,true)">
+    <image xlink:href="nut.png" x="30" y="110" width="30" height="30"/>
+  </g>  
+  <g onclick="step(3,1,true)">
+    <image xlink:href="nut.png" x="60" y="110" width="30" height="30"/>
+  </g>  
+  <text text-anchor="start" x="90" y="128" fill="white"> = 300</text>
+
+  <image xlink:href="javalogo.png"    x="0"  y="140" width="30" height="30"/>
+  <image xlink:href="eclipselogo.png" x="30" y="140" width="30" height="30"/>
+  <image xlink:href="gitlogo.svg"     x="60" y="140" width="150" height="150" transform="translate(42,97) scale(0.3)"/>
+  <text text-anchor="start"           x="90" y="158" fill="white"> = 200</text>
+
+<!--
+  <text text-anchor="end"               x="20" y="192" fill="white">3 X</text>
+  <image xlink:href="strawberry_01.png" x="20" y="170" width="30" height="30"/>
+  <text text-anchor="start"             x="50" y="192" fill="white"> = 100</text>
+
+  <text text-anchor="end"               x="20" y="222" fill="white">* X</text>
+  <image xlink:href="apple.png"         x="22" y="202" width="25" height="25"/>
+  <text text-anchor="start"             x="50" y="222" fill="white"> = 0</text>
+
+
+  <text text-anchor="end"               x="150" y="132" fill="white">2 X</text>
+  <image xlink:href="nut.png"           x="150" y="110" width="30" height="30"/>
+  <text text-anchor="start"             x="180" y="132" fill="white"> = 40</text>
+
+  <text text-anchor="start"             x="125" y="162" fill="white">2 X *</text>
+  <text text-anchor="start"             x="180" y="162" fill="white"> = 10</text>
+  -->
+  <g transform="translate(20 -10)">
+    <g stroke="white" stroke-width="10">
+      <text x="120" y="220" fill="white" font-size="50" font-weight="bold" transform="rotate(-25,120,220)">t</text>
+      <circle cx="160" cy="205" r="22"/>
+      <circle cx="200" cy="205" r="22"/>
+      <text x="220" y="205" fill="white" font-size="50" font-weight="bold" transform="rotate(15,130,220)">l</text>
+      <text x="250" y="220" fill="white" font-size="50" font-weight="bold" transform="rotate(-15,250,220)">s</text>
+    </g>
+    <text x="120" y="220" fill="red" font-size="50" font-weight="bold" transform="rotate(-25,120,220)">t</text>
+    <image xlink:href="nut.png" x="135" y="180" width="50" height="50"/>
+    <image xlink:href="nut.png" x="175" y="180" width="50" height="50"/>
+    <text x="220" y="205" fill="blue" font-size="50" font-weight="bold" transform="rotate(15,130,220)">l</text>
+    <text x="250" y="220" fill="green" font-size="50" font-weight="bold" transform="rotate(-15,250,220)">s</text>
+  </g>
+</svg>
